@@ -2,6 +2,7 @@
 import logging
 import logging.config
 import datetime
+#from datetime import datetime
 #import json
 from dotenv import load_dotenv
 from sqlalchemy import select
@@ -13,10 +14,10 @@ from sqlalchemy.engine import URL
 #import nornir
 from nornir import InitNornir
 #from nornir.core.inventory import Host
-from nornir_utils.plugins.functions import print_result
-from napalm import get_network_driver
+#from nornir_utils.plugins.functions import print_result
+#from napalm import get_network_driver
 #from rich import print as rprint
-import config as config
+from config import parse_arguments, load_config, LOGO
 import file_io as file_io
 import sql_io as sql_io
 import models as models
@@ -51,39 +52,14 @@ def get_inventory(sess, conf):
                 }
             },
         }
-    inv2={
-    "name": "str",
-    "connection_options": {
-        "$connection_type": {
-            "extras": {
-                "$key": "$value"
-            },
-            "hostname": "str",
-            "port": "int",
-            "username": "str",
-            "password": "str",
-            "platform": "str"
-        }
-    },
-    "groups": [
-        "$group_name"
-    ],
-    "data": {
-        "$key": "$value"
-    },
-    "hostname": "str",
-    "port": "int",
-    "username": "str",
-    "password": "str",
-    "platform": "str"
-    }
     logger.info(inv)
     return inv
+
 def init_nr(sess,conf):
-    groups = {'iosxr':  {'platform': 'iosxr'},
-            'iosxe':  {'platform': 'iosxe'},
-            'ios':  {'platform': 'ios'},
-            'nxos':  {'platform': 'nxos'}}
+    # groups = {'iosxr':  {'platform': 'iosxr'},
+    #         'iosxe':  {'platform': 'iosxe'},
+    #         'ios':  {'platform': 'ios'},
+    #         'nxos':  {'platform': 'nxos'}}
     #print(get_inventory(sess, conf))
     nr = InitNornir(
         runner={'plugin': "threaded", "options": {"num_workers": 10}},
@@ -105,23 +81,23 @@ def main_app():
     # load environment
     load_dotenv()
     # Parse command-line arguments
-    args = config.parse_arguments()
+    args = parse_arguments()
     print(args)
 
     #create filemanager instance
-    file_manager = file_io.FileManager({})
+    file_manager = file_io.FileManager()
 
     # Load the configuration
-    cfg = config.load_config(args.config, file_manager)
-    logger.info(config.LOGO)
+    cfg = load_config(args.config, file_manager)
+    logger.info(LOGO)
     # purge things
     if args.purge==True:
         logger.info('_____purging')
         file_manager.delete_file(cfg.get("app_defaults", {}).get("database", 'database.db'))
 
-
+    ####!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # Read a CSV file
-    file_manager = file_io.FileManager(config)
+    #file_manager = file_io.FileManager()
 
     groups = {'iosxr':  {'platform': 'iosxr'},
                 'iosxe':  {'platform': 'iosxe'},
@@ -182,12 +158,12 @@ def main_app():
                 usr_obj = session.scalars(user).first()
                 #print("===============",usr_obj)
                 row_port = row["port"] if 'port' in row else None
-
+                user_id = models.User.id
                 device_data = {
                 'name': row['name'],
                 'hostname': row['hostname'],
                 'port': row_port,
-                'user_id': usr_obj.id,
+                'user_id': user_id,
                 'platform': row['platform'],
                 'groups': groups[row['platform']]['platform'],
                 'created_at': datetime.datetime.now(),
@@ -244,21 +220,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    """
-    {
-    "name": "str",
-    "connection_options": {"$connection_type": {"extras": {"$key": "$value"},
-        "hostname": "str",
-        "port": "int",
-        "username": "str",
-        "password": "str",
-        "platform": "str"}},
-    "groups": ["$group_name"],
-    "data": {"$key": "$value"},
-    "hostname": "str",
-    "port": "int",
-    "username": "str",
-    "password": "str",
-    "platform": "str"
-}
-    """

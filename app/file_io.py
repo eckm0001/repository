@@ -12,8 +12,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 class FileManager:
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
+        #self.config_file = config , config_file
         self.basedir = Path('app/data/')
         self.logger = logging.getLogger(__name__)
 
