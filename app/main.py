@@ -12,7 +12,7 @@ from sqlalchemy.engine import URL
 #import pandas as pd
 #import nornir
 from nornir import InitNornir
-from nornir.core.inventory import Host
+#from nornir.core.inventory import Host
 from nornir_utils.plugins.functions import print_result
 from napalm import get_network_driver
 #from rich import print as rprint
@@ -129,8 +129,10 @@ def main_app():
                 'nxos':  {'platform': 'nxos'}}
     defaults = {'username': cfg['env']['app_cred_u1'], 'password': cfg['env']['app_cred_p1']}
 
-    #db_url = URL.create(        drivername='sqlite',        database= 'app/data/output/master.sqlite3')
-    #db_url = 'sqlite:///app/data/output/' + cfg.get("app_defaults", {}).get("database", 'database.db')
+    #db_url = URL.create(        drivername='sqlite',
+    #         database= 'app/data/output/master.sqlite3')
+    #db_url = 'sqlite:///app/data/output/' + cfg.get
+    # ("app_defaults", {}).get("database", 'database.db')
     # Create a DatabaseManager instance
 
     db_manager = sql_io.DatabaseManager(URL.create(drivername='sqlite',database= 'app/data/output/master.sqlite3'))
@@ -139,17 +141,17 @@ def main_app():
     db_manager.create_tables(models.Device, models.User)
 
     logger.info('Application started')
-    logger.info(f"Command line args: {args}")
+    logger.info("Command line args: %s", args)
     #logger.info(f'Environment variables: {cfg["env"]}')
     #logger.info(f'Logging variables: {cfg["logging"]}')
-    logger.info(f'Application defaults: {cfg["app_defaults"]}')
+    logger.info('Application defaults: %s', cfg["app_defaults"])
 
 #initialize data
     with db_manager.session_scope() as session:
         stmt = select(models.User).filter_by(username=defaults['username'])
         user_obj = session.scalars(stmt).first()
         if not user_obj:
-            logger.debug(f"_____{defaults['username']} does not exist")
+            logger.debug('%s does not exist', defaults['username'])
             user_data = {
                 'username': defaults['username'],
                 'password': defaults['password'],
@@ -160,11 +162,11 @@ def main_app():
             stmt = select(models.User).filter_by(username=defaults['username'])
             user_obj = session.scalars(stmt).first()
             if user_obj:
-                logger.info(f"_____{defaults['username']} created")
+                logger.info('_____%s created', defaults['username'])
             else:
-                logger.error(f"_____{defaults['username']} not created")
+                logger.error('_____%s not created', defaults['username'])
         else:
-            logger.debug(f"_____{defaults['username']} exists")
+            logger.debug('_____%s exists', defaults['username'])
 
         for row in file_manager.read_csv('devices.csv'):
             logger.debug("_____%s",row['name'])
@@ -173,9 +175,9 @@ def main_app():
             dev_obj = session.scalars(stmt).first()
             if dev_obj:
                 #print(devs,row['name'])
-                logger.debug(f"_____{row.get('name')} exists")
+                logger.debug("_____%s  exists", row.get('name'))
             else:
-                logger.error(f"_____{row.get('name')} does not exist")
+                logger.error('_____%s does not exist', row.get('name'))
                 user = select(models.User).filter_by(username=defaults['username'])
                 usr_obj = session.scalars(user).first()
                 #print("===============",usr_obj)
@@ -196,9 +198,9 @@ def main_app():
                 stmt = select(models.Device,models.User).filter_by(id=models.User.id)
                 dev_obj = session.scalars(stmt).first()
                 if dev_obj:
-                    logger.info(f"_____{row['name']} created {dev_obj}")
+                    logger.info('_____%s %s created', row['name'], dev_obj)
                 else:
-                    logger.error(f"_____{row['name']} not created")
+                    logger.error('_____%s  not created', row['name'])
     # next section
     #data = {}
     with db_manager.session_scope() as session:
