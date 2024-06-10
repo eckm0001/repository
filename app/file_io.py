@@ -34,14 +34,14 @@ class FileManager:
     def read_file(self, filename):
         try:
             #print(self.basedir)
-            with self.custom_read(self.basedir / 'input' / filename) as file:
+            with self.custom_read(self.basedir / "input" / filename) as file:
                 content = file.read()
-            self.logger.info(f'Read file: {self.basedir / 'input' / filename}')
+            self.logger.info(f'Read file: {self.basedir / "input" / filename}')
             return content
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / 'input' / filename}')
+            self.logger.error(f'File not found: {self.basedir / "input" / filename}')
         except Exception as e:
-            self.logger.error(f'Error reading file: {self.basedir / 'input' / filename}, {e}')
+            self.logger.error(f'Error reading file: {self.basedir / "input" / filename}, {e}')
 
     def delete_file(self, filename):
         """
@@ -54,7 +54,7 @@ class FileManager:
             bool: True if the file was successfully deleted, False otherwise.
         """
         try:
-            file_path = self.basedir / 'output' / filename
+            file_path = self.basedir / "output" / filename
             if file_path.exists():
                 file_path.unlink()
                 self.logger.info(f'Deleted file: {file_path}')
@@ -69,14 +69,14 @@ class FileManager:
     def read_yaml(self, filename):
         try:
             #print(self.basedir)
-            with self.custom_read(self.basedir / 'input' / filename) as file:
+            with self.custom_read(self.basedir / "input" / filename) as file:
                 content = yaml.safe_load(file)
-            self.logger.info(f'Read file: {self.basedir / 'input' / filename}')
+            self.logger.info(f'Read file: {self.basedir / "input" / filename}')
             return content
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / 'input' / filename}')
+            self.logger.error(f'File not found: {self.basedir / "input" / filename}')
         except Exception as e:
-            self.logger.error(f'Error reading file: {self.basedir / 'input' / filename}, {e}')
+            self.logger.error(f'Error reading file: {self.basedir / "input" / filename}, {e}')
 
     def read_csv(self, file_path):
         """
@@ -89,20 +89,20 @@ class FileManager:
             list: A list of dictionaries, where each dictionary represents a row in the CSV file.
         """
         try:
-            with self.custom_read(self.basedir / 'input' / file_path) as file:
+            with self.custom_read(self.basedir / "input" / file_path) as file:
                 reader = csv.DictReader(file)
                 data = list(reader)
-            self.logger.info(f'Read CSV file: {self.basedir / 'input' / file_path}')
+            self.logger.info(f'Read CSV file: {self.basedir / "input" / file_path}')
             return data
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / 'input' / file_path}')
+            self.logger.error(f'File not found: {self.basedir / "input" / file_path}')
         except Exception as e:
-            self.logger.error(f'Error reading CSV file: {self.basedir / 'input' / file_path}, {e}')
+            self.logger.error(f'Error reading CSV file: {self.basedir / "input" / file_path}, {e}')
 
     def write_file(self, filename, content):
         try:
-            with self.custom_write(self.basedir / 'output' / filename) as file:
+            with self.custom_write(self.basedir / "output" / filename) as file:
                 file.write(content)
-            self.logger.info(f'Wrote file: {self.basedir / 'output' / filename}')
+            self.logger.info(f'Wrote file: {self.basedir / "output" / filename}')
         except Exception as e:
-            self.logger.error(f'Error writing file: {self.basedir / 'output' / filename}, {e}')
+            self.logger.error(f'Error writing file: {self.basedir / "output" / filename}, {e}')
