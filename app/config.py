@@ -29,6 +29,7 @@ def load_config(config_path, file_manager_inst):
     """
     Load the application configuration from a YAML file and environment variables.
     """
+    cfg_path = None
     env_vars = {
         key.lower(): value
         for key, value in os.environ.items()
