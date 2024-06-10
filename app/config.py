@@ -2,16 +2,17 @@ import argparse
 import yaml
 import os
 import logging
+import logging.config
 import colorlog
 logger = logging.getLogger(__name__)
 
 import file_io as file_io
 
-def setup_logging(config):
+def setup_logging(logging_config):
     """
     Set up logging based on the provided configuration.
     """
-    logging.config.dictConfig(config)
+    logging.config.dictConfig(logging_config)
 
 def parse_arguments():
     """
@@ -23,7 +24,8 @@ def parse_arguments():
     args = parser.parse_args()
 
     return args
-def load_config(config_path, file_manager):
+
+def load_config(config_path, file_manager_inst):
     """
     Load the application configuration from a YAML file and environment variables.
     """
@@ -33,12 +35,12 @@ def load_config(config_path, file_manager):
         if key.startswith('APP_')
     }
     if 'APP_CONFIG_FILE' in env_vars:
-        if envvars['APP_CONF_FILE'] != args.config:
-            config_path = os.environ['APP_CONFIG_FILE']
+        if env_vars['APP_CONF_FILE'] != config_path:
+            cfg_path = os.environ['APP_CONFIG_FILE']
         else:
-            config_path = args.config
+            cfg_path = config_path
     #print(config_path)
-    config = file_manager.read_yaml(config_path)
+    config = file_manager_inst.read_yaml(cfg_path)
     if config:
         setup_logging(config["logging"])
         #config = yaml.safe_load(config_content)
