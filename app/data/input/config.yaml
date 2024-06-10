@@ -44,8 +44,10 @@ logging:
       propagate: no
 
 app_defaults:
-  config_file: 'config.yaml'
-  database: 'master.sqlite3'
+  config_path: app/data/input/config.yaml
+  database_path: app/data/output/master.sqlite3
+  log_path: app/data/output/app.log
+  csv_path: app/data/input/devices.csv
   default_value: 42
   another_value: 'hello'
   nested:

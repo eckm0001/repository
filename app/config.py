@@ -1,6 +1,7 @@
 import argparse
 import yaml
 import os
+from pathlib import Path
 import logging
 import logging.config
 import colorlog
@@ -19,7 +20,7 @@ def parse_arguments():
     Parse command-line arguments.
     """
     parser = argparse.ArgumentParser(description='My Python Application')
-    parser.add_argument('-c', '--config', help='Path to the configuration file', default='config.yaml', required=False)
+    parser.add_argument('-c', '--config', help='Path to the configuration file', default='app/data/input/config.yaml', required=False)
     parser.add_argument("-p", "--purge", action='store_true', default=False, help="purge database before storing")
     args = parser.parse_args()
 
@@ -35,17 +36,17 @@ def load_config(config_path, file_manager_inst):
         for key, value in os.environ.items()
         if key.startswith('APP_')
     }
-    if 'APP_CONFIG_FILE' in env_vars:
-        if env_vars['APP_CONF_FILE'] != config_path:
-            cfg_path = os.environ['APP_CONFIG_FILE']
-        else:
-            cfg_path = config_path
-    #print(config_path)
-    config = file_manager_inst.read_yaml(cfg_path)
+    print(env_vars)
+    if 'app_config_file' in env_vars:
+        if env_vars['app_config_file'] != config_path:
+            config_path = env_vars['app_config_file']
+
+    print(config_path)
+    config = file_manager_inst.read_yaml(config_path)
     if config:
         setup_logging(config["logging"])
         #config = yaml.safe_load(config_content)
-        #print(config)
+        print(config)
         # Load environment variables
 
         # Merge environment variables into the configuration

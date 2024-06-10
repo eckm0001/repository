@@ -143,40 +143,41 @@ def main_app():
                 logger.error('_____%s not created', defaults['username'])
         else:
             logger.debug('_____%s exists', defaults['username'])
-
-        for row in file_manager.read_csv('devices.csv'):
-            logger.debug("_____%s",row['name'])
-            device_data = {}
-            stmt = select(models.Device).filter_by(name=row['name'])
-            dev_obj = session.scalars(stmt).first()
-            if dev_obj:
-                #print(devs,row['name'])
-                logger.debug("_____%s  exists", row.get('name'))
-            else:
-                logger.error('_____%s does not exist', row.get('name'))
-                user = select(models.User).filter_by(username=defaults['username'])
-                usr_obj = session.scalars(user).first()
-                #print("===============",usr_obj)
-                row_port = row["port"] if 'port' in row else None
-                user_id = models.User.id
-                device_data = {
-                'name': row['name'],
-                'hostname': row['hostname'],
-                'port': row_port,
-                'user_id': user_id,
-                'platform': row['platform'],
-                'groups': groups[row['platform']]['platform'],
-                'created_at': datetime.datetime.now(),
-                }
-                session.add(models.Device(**device_data))
-                session.commit()
-
-                stmt = select(models.Device,models.User).filter_by(id=models.User.id)
+        csv_data=file_manager.read_csv(cfg["app_defaults"]["csv_path"])
+        if csv_data:
+            for row in csv_data:
+                logger.debug("_____%s",row['name'])
+                device_data = {}
+                stmt = select(models.Device).filter_by(name=row['name'])
                 dev_obj = session.scalars(stmt).first()
                 if dev_obj:
-                    logger.info('_____%s %s created', row['name'], dev_obj)
+                    #print(devs,row['name'])
+                    logger.debug("_____%s  exists", row.get('name'))
                 else:
-                    logger.error('_____%s  not created', row['name'])
+                    logger.error('_____%s does not exist', row.get('name'))
+                    user = select(models.User).filter_by(username=defaults['username'])
+                    usr_obj = session.scalars(user).first()
+                    #print("===============",usr_obj)
+                    row_port = row["port"] if 'port' in row else None
+                    user_id = models.User.id
+                    device_data = {
+                    'name': row['name'],
+                    'hostname': row['hostname'],
+                    'port': row_port,
+                    'user_id': user_id,
+                    'platform': row['platform'],
+                    'groups': groups[row['platform']]['platform'],
+                    'created_at': datetime.datetime.now(),
+                    }
+                    session.add(models.Device(**device_data))
+                    session.commit()
+
+                    stmt = select(models.Device,models.User).filter_by(id=models.User.id)
+                    dev_obj = session.scalars(stmt).first()
+                    if dev_obj:
+                        logger.info('_____%s %s created', row['name'], dev_obj)
+                    else:
+                        logger.error('_____%s  not created', row['name'])
     # next section
     #data = {}
     with db_manager.session_scope() as session:
