@@ -5,12 +5,12 @@ import datetime
 #import json
 from dotenv import load_dotenv
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+#from sqlalchemy.orm import Session
 from sqlalchemy.engine import URL
-import sqlalchemy as db
+#import sqlalchemy as db
 #from nornir_table_inventory import FlatDataInventory
-import pandas as pd
-import nornir as nornir
+#import pandas as pd
+#import nornir
 from nornir import InitNornir
 from nornir.core.inventory import ConnectionOptions, Host
 from nornir_utils.plugins.functions import print_result
