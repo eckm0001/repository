@@ -1,0 +1,52 @@
+logging:
+  version: 1
+  formatters:
+    colored:
+      (): colorlog.ColoredFormatter
+      format: '%(log_color)s%(levelname)7s%(reset)s %(bg_blue)s[%(name)8s]%(reset)s %(blue)s%(message)s (%(lineno)d)'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+    simple:
+      format: '%(asctime)s - %(name)8s - %(levelname)5s - %(message)s (%(lineno)d)'
+  handlers:
+    console:
+      class: colorlog.StreamHandler
+      level: DEBUG
+      formatter: colored
+      stream: ext://sys.stdout
+  loggers:
+    __main__:
+      level: DEBUG
+      handlers: [console]
+      propagate: no
+    config:
+      level: DEBUG
+      handlers: [console]
+      propagate: no
+    file_io:
+      level: DEBUG
+      handlers: [console]
+      propagate: no
+    sqlalchemy.engine.Engine:
+      level: WARNING
+      handlers: [console]
+      propagate: no
+    sqlalchemy.pool:
+      level: WARNING
+      handlers: [console]
+      propagate: no
+    nornir:
+      level: WARNING
+      handlers: [console]
+      propagate: no
+    nornir.core:
+      level: WARNING
+      handlers: [console]
+      propagate: no
+
+app_defaults:
+  config_file: 'config.yaml'
+  database: 'master.sqlite3'
+  default_value: 42
+  another_value: 'hello'
+  nested:
+    key: 'value'
