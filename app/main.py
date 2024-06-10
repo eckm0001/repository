@@ -2,9 +2,9 @@
 import logging
 import logging.config
 import datetime
-import json
+#import json
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.engine import URL
 import sqlalchemy as db

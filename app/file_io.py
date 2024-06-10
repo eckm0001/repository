@@ -2,10 +2,11 @@
 from contextlib import contextmanager
 from pathlib import Path
 import logging
-import yaml
 import csv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import yaml
+
+#from sqlalchemy import create_engine
+#from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -17,7 +18,7 @@ class FileManager:
 
     @contextmanager
     def custom_read(self, filename):
-        f = open(filename, "r")
+        f = open(filename, "r", encoding='utf-8')
         try:
             yield f
         finally:
@@ -25,7 +26,7 @@ class FileManager:
 
     @contextmanager
     def custom_write(self, filename):
-        f = open(filename, "w")
+        f = open(filename, "w", encoding='utf-8')
         try:
             yield f
         finally:
@@ -36,12 +37,12 @@ class FileManager:
             #print(self.basedir)
             with self.custom_read(self.basedir / "input" / filename) as file:
                 content = file.read()
-            self.logger.info(f'Read file: {self.basedir / "input" / filename}')
+            self.logger.info('Read file: %s', self.basedir / "input" / filename)
             return content
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / "input" / filename}')
+            self.logger.error('File not found: %s', self.basedir / "input" / filename)
         except Exception as e:
-            self.logger.error(f'Error reading file: {self.basedir / "input" / filename}, {e}')
+            self.logger.error('Error reading file: %s %s', self.basedir / "input" / filename, e)
 
     def delete_file(self, filename):
         """
@@ -57,13 +58,13 @@ class FileManager:
             file_path = self.basedir / "output" / filename
             if file_path.exists():
                 file_path.unlink()
-                self.logger.info(f'Deleted file: {file_path}')
+                self.logger.info('Deleted file: %s', file_path)
                 return True
             else:
-                self.logger.warning(f'File not found: {file_path}')
+                self.logger.warning('File not found: %s', file_path)
                 return False
         except Exception as e:
-            self.logger.error(f'Error deleting file: {file_path}, {e}')
+            self.logger.error('Error deleting file: %s %s', file_path, e)
             return False
 
     def read_yaml(self, filename):
@@ -71,12 +72,12 @@ class FileManager:
             #print(self.basedir)
             with self.custom_read(self.basedir / "input" / filename) as file:
                 content = yaml.safe_load(file)
-            self.logger.info(f'Read file: {self.basedir / "input" / filename}')
+            self.logger.info('Read file: %s', self.basedir / "input" / filename)
             return content
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / "input" / filename}')
+            self.logger.error('File not found: %s', self.basedir / "input" / filename)
         except Exception as e:
-            self.logger.error(f'Error reading file: {self.basedir / "input" / filename}, {e}')
+            self.logger.error('Error reading file: %s %s', self.basedir / "input" / filename, e)
 
     def read_csv(self, file_path):
         """
@@ -92,17 +93,17 @@ class FileManager:
             with self.custom_read(self.basedir / "input" / file_path) as file:
                 reader = csv.DictReader(file)
                 data = list(reader)
-            self.logger.info(f'Read CSV file: {self.basedir / "input" / file_path}')
+            self.logger.info('Read CSV file: %s', self.basedir / "input" / file_path)
             return data
         except FileNotFoundError:
-            self.logger.error(f'File not found: {self.basedir / "input" / file_path}')
+            self.logger.error('File not found: %s', self.basedir / "input" / file_path)
         except Exception as e:
-            self.logger.error(f'Error reading CSV file: {self.basedir / "input" / file_path}, {e}')
+            self.logger.error('Error reading CSV file: %s %s', self.basedir / "input" / file_path, e)
 
     def write_file(self, filename, content):
         try:
             with self.custom_write(self.basedir / "output" / filename) as file:
                 file.write(content)
-            self.logger.info(f'Wrote file: {self.basedir / "output" / filename}')
+            self.logger.info('Wrote file: %s', self.basedir / "output" / filename)
         except Exception as e:
-            self.logger.error(f'Error writing file: {self.basedir / "output" / filename}, {e}')
+            self.logger.error('Error writing file: %s %s', self.basedir / "output" / filename, e)
