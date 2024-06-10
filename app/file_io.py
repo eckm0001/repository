@@ -1,4 +1,5 @@
 
+from ast import Dict
 from contextlib import contextmanager
 from pathlib import Path
 import logging
@@ -79,7 +80,9 @@ class FileManager:
         except Exception as e:
             self.logger.error('Error reading file: %s %s', self.basedir / "input" / filename, e)
 
-    def read_csv(self, file_path):
+    def read_csv(self, file_path) -> list:
+
+
         """
         Read a CSV file and return its contents as a list of dictionaries.
 
@@ -94,12 +97,13 @@ class FileManager:
                 reader = csv.DictReader(file)
                 data = list(reader)
             self.logger.info('Read CSV file: %s', self.basedir / "input" / file_path)
-            return data
+
         except FileNotFoundError:
             self.logger.error('File not found: %s', self.basedir / "input" / file_path)
         except Exception as e:
             self.logger.error('Error reading CSV file: %s %s', self.basedir / "input" / file_path, e)
-
+        finally:
+            return data
     def write_file(self, filename, content):
         try:
             with self.custom_write(self.basedir / "output" / filename) as file:

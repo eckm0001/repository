@@ -3,10 +3,11 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.engine import URL
 from models import Base, User, Device
 
 class DatabaseManager:
-    def __init__(self, db_url: str):
+    def __init__(self, db_url: URL):
         self.engine = create_engine(db_url, echo=False)
         self.connection = self.engine.connect()
         self.Session = sessionmaker(bind=self.engine)

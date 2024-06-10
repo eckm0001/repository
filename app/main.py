@@ -12,7 +12,7 @@ from sqlalchemy.engine import URL
 #import pandas as pd
 #import nornir
 from nornir import InitNornir
-from nornir.core.inventory import ConnectionOptions, Host
+from nornir.core.inventory import Host
 from nornir_utils.plugins.functions import print_result
 from napalm import get_network_driver
 #from rich import print as rprint
@@ -85,7 +85,7 @@ def init_nr(sess,conf):
             'ios':  {'platform': 'ios'},
             'nxos':  {'platform': 'nxos'}}
     #print(get_inventory(sess, conf))
-    nr = nornir.InitNornir(
+    nr = InitNornir(
         runner={'plugin': "threaded", "options": {"num_workers": 10}},
         inventory={
             "plugin": "DictInventory",
@@ -129,14 +129,11 @@ def main_app():
                 'nxos':  {'platform': 'nxos'}}
     defaults = {'username': cfg['env']['app_cred_u1'], 'password': cfg['env']['app_cred_p1']}
 
-    db_url = URL.create(
-        drivername='sqlite',
-        database= 'app/data/output/' + cfg.get("app_defaults", {}).get("database", 'database.db')
-    )
+    #db_url = URL.create(        drivername='sqlite',        database= 'app/data/output/master.sqlite3')
     #db_url = 'sqlite:///app/data/output/' + cfg.get("app_defaults", {}).get("database", 'database.db')
+    # Create a DatabaseManager instance
 
-        # Create a DatabaseManager instance
-    db_manager = sql_io.DatabaseManager(db_url)
+    db_manager = sql_io.DatabaseManager(URL.create(drivername='sqlite',database= 'app/data/output/master.sqlite3'))
 
     # Create tables
     db_manager.create_tables(models.Device, models.User)
