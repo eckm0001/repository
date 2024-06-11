@@ -27,56 +27,6 @@ import nr as mynr
 # # Get the logger instance
 logger = logging.getLogger(__name__)
 
-def get_inventory(sess, conf):
-    defaults = {'username': conf['env']['app_cred_u1'], 'password': conf['env']['app_cred_p1']}
-    users = sess.execute(
-        select(models.Users).where(models.Users.username.in_([defaults['username']]))
-    ).first()[0]
-    username = users.username
-    password = users.password
-    devices = sess.execute(
-        select(models.Devices)
-    ).fetchall()
-    inv = {}
-    for line in devices:
-        if line.Devices.enabled:
-            inv[line.Devices.name] = {
-                "name": line.Devices.name,
-                "connection_options": {
-                    "napalm": {
-                        "hostname": line.Devices.hostname,
-                        "port": 22,
-                        "username": username,
-                        "password": password,
-                        "platform": line.Devices.platform
-                    }
-                },
-                "enabled": line.Devices.enabled
-            }
-    logger.info(inv)
-    return inv
-
-def init_nr(sess,conf):
-    # groups = {'iosxr':  {'platform': 'iosxr'},
-    #         'iosxe':  {'platform': 'iosxe'},
-    #         'ios':  {'platform': 'ios'},
-    #         'nxos':  {'platform': 'nxos'}}
-    #print(get_inventory(sess, conf))
-    nr = InitNornir(
-        runner={'plugin': "threaded", "options": {"num_workers": 10}},
-        inventory={
-            "plugin": "DictInventory",
-            "options": {
-                "hosts": get_inventory(sess, conf),
-                "groups": [],
-                "defaults": []
-                }
-            },
-        logging={"enabled": False, "to_console": True, "level": "DEBUG"},
-    )
-    #print(json.dumps(Host.schema(), indent=4))
-    return nr
-
 def main_app():
 
     # load environment
@@ -159,23 +109,23 @@ def main_app():
                     logger.debug("_____%s  exists", row.get('name'))
                 else:
                     logger.error('_____%s does not exist', row.get('name'))
-                    user = select(models.Users).filter_by(username=defaults['username'])
-                    usr_obj = session.scalars(user).first()
-                    #print("===============",usr_obj)
-                    row_port = row["port"] if 'port' in row else None
-                    user_id = models.Users.id
-                    device_data = {
-                    'name': row['name'],
-                    'hostname': row['hostname'],
-                    'port': row_port,
-                    'user_id': user_obj.id,
-                    'platform': row['platform'],
-                    'groups': groups[row['platform']]['platform'],
-                    'enabled': True,
-                    'created_at': datetime.datetime.now(),
-                    }
-                    session.add(models.Devices(**device_data))
-                    session.commit()
+                    usr = select(models.Users).filter_by(username=defaults['username'])
+                    usr_obj = session.scalars(usr).first()
+                    if usr_obj != None:
+                        #print("===============",usr_obj)
+                        row_port = row["port"] if 'port' in row else None
+                        device_data = {
+                            'name': row['name'],
+                            'hostname': row['hostname'],
+                            'port': row_port,
+                            'user_id': usr_obj.id, #  models.Users.id
+                            'platform': row['platform'],
+                            'groups': groups[row['platform']]['platform'],
+                            'enabled': True,
+                            'created_at': datetime.datetime.now(),
+                        }
+                        session.add(models.Devices(**device_data))
+                        session.commit()
 
                     stmt = select(models.Devices,models.Users).filter_by(id=models.Users.id)
                     dev_obj = session.scalars(stmt).first()
@@ -186,7 +136,7 @@ def main_app():
     # next section
     #data = {}
     with db_manager.session_scope() as session:
-        nr = init_nr(session, cfg)
+        nr = mynr.init_nr(session, cfg)
 
         result1=nr.run(
             name='facts',

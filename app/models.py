@@ -85,7 +85,7 @@ class Devices(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     hostname: Mapped[str] = mapped_column(String, nullable=False)
     port: Mapped[int] = mapped_column(Integer, nullable=True)
-    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users_table.id'))
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users_table.id'), default=Any|None)
     platform: Mapped[str] = mapped_column(String, nullable=True) 
     groups: Mapped[List[str]] = mapped_column(String, nullable=True)
     data: Mapped[List[str]] = mapped_column(String, nullable=True)

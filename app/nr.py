@@ -7,58 +7,30 @@ from nornir.core.task import AggregatedResult, MultiResult, Result, Task
 from nornir_napalm.plugins.tasks import napalm_configure, napalm_cli, napalm_get
 from nornir_netmiko.tasks import netmiko_send_command
 
-# class PrintResult:
-#     def task_started(self, task: Task) -> None:
-#         print(f">>> starting: {task.name}")
+import sql_io as sql_io
 
-#     def task_completed(self, task: Task, result: AggregatedResult) -> None:
-#         print(f">>> completed: {task.name}")
+logger = logging.getLogger(__name__)
 
-#     def task_instance_started(self, task: Task, host: Host) -> None:
-#         pass
-
-#     def task_instance_completed(
-#         self, task: Task, host: Host, result: MultiResult
-#     ) -> None:
-#         print(f"  - {host.name}: - {result.result}")
-
-#     def subtask_instance_started(self, task: Task, host: Host) -> None:
-#         pass  # to keep example short and sweet we ignore subtasks
-
-#     def subtask_instance_completed(
-#         self, task: Task, host: Host, result: MultiResult
-#     ) -> None:
-#         pass  # to keep example short and sweet we ignore subtasks
-
-# class SaveResultToDict:
-#     def __init__(self, data: Dict[str, None]) -> None:
-#         self.data = data
-
-#     def task_started(self, task: Task) -> None:
-#         self.data[task.name] = {}
-#         self.data[task.name]["started"] = True
-
-#     def task_completed(self, task: Task, result: AggregatedResult) -> None:
-#         self.data[task.name]["completed"] = True
-
-#     def task_instance_started(self, task: Task, host: Host) -> None:
-#         self.data[task.name][host.name] = {"started": True}
-
-#     def task_instance_completed(
-#         self, task: Task, host: Host, result: MultiResult
-#     ) -> None:
-#         self.data[task.name][host.name] = {
-#             "completed": True,
-#             "result": result.result,
-#         }
-
-#     def subtask_instance_started(self, task: Task, host: Host) -> None:
-#         pass  # to keep example short and sweet we ignore subtasks
-
-#     def subtask_instance_completed(
-#         self, task: Task, host: Host, result: MultiResult
-#     ) -> None:
-#         pass  # to keep example short and sweet we ignore subtasks
+def init_nr(sess,conf):
+    # groups = {'iosxr':  {'platform': 'iosxr'},
+    #         'iosxe':  {'platform': 'iosxe'},
+    #         'ios':  {'platform': 'ios'},
+    #         'nxos':  {'platform': 'nxos'}}
+    #print(get_inventory(sess, conf))
+    nr = InitNornir(
+        runner={'plugin': "threaded", "options": {"num_workers": 10}},
+        inventory={
+            "plugin": "DictInventory",
+            "options": {
+                "hosts": sql_io.get_inventory(sess, conf),
+                "groups": [],
+                "defaults": []
+                }
+            },
+        logging={"enabled": False, "to_console": True, "level": "DEBUG"},
+    )
+    #print(json.dumps(Host.schema(), indent=4))
+    return nr
 
 def greeter(task: Task, greet: str) -> Result:
     return Result(host=task.host, result=f"{greet}! my name is {task.host.name}")
@@ -149,3 +121,56 @@ def command_using_netmiko(task: Task,) -> Result:
         severity_level=logging.DEBUG,
     )
     return Result(host=task.host, result=cmd_ret)
+
+# class PrintResult:
+#     def task_started(self, task: Task) -> None:
+#         print(f">>> starting: {task.name}")
+
+#     def task_completed(self, task: Task, result: AggregatedResult) -> None:
+#         print(f">>> completed: {task.name}")
+
+#     def task_instance_started(self, task: Task, host: Host) -> None:
+#         pass
+
+#     def task_instance_completed(
+#         self, task: Task, host: Host, result: MultiResult
+#     ) -> None:
+#         print(f"  - {host.name}: - {result.result}")
+
+#     def subtask_instance_started(self, task: Task, host: Host) -> None:
+#         pass  # to keep example short and sweet we ignore subtasks
+
+#     def subtask_instance_completed(
+#         self, task: Task, host: Host, result: MultiResult
+#     ) -> None:
+#         pass  # to keep example short and sweet we ignore subtasks
+
+# class SaveResultToDict:
+#     def __init__(self, data: Dict[str, None]) -> None:
+#         self.data = data
+
+#     def task_started(self, task: Task) -> None:
+#         self.data[task.name] = {}
+#         self.data[task.name]["started"] = True
+
+#     def task_completed(self, task: Task, result: AggregatedResult) -> None:
+#         self.data[task.name]["completed"] = True
+
+#     def task_instance_started(self, task: Task, host: Host) -> None:
+#         self.data[task.name][host.name] = {"started": True}
+
+#     def task_instance_completed(
+#         self, task: Task, host: Host, result: MultiResult
+#     ) -> None:
+#         self.data[task.name][host.name] = {
+#             "completed": True,
+#             "result": result.result,
+#         }
+
+#     def subtask_instance_started(self, task: Task, host: Host) -> None:
+#         pass  # to keep example short and sweet we ignore subtasks
+
+#     def subtask_instance_completed(
+#         self, task: Task, host: Host, result: MultiResult
+#     ) -> None:
+#         pass  # to keep example short and sweet we ignore subtasks
