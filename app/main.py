@@ -205,7 +205,6 @@ def main_app():
         for host in nr.inventory.hosts.keys():
             print("---")
             if result1[host][0].failed:
-                #TODO: setup code to enable "enabled false"
                 print(f"{host} failed")
                 stmt = select(models.Device).filter_by(name=models.Device.name)
                 dev_obj = session.scalars(stmt).first()
