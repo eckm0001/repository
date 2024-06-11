@@ -44,7 +44,7 @@ logging:
       propagate: no
 
 app_defaults:
-
+  base_dir: /repository/repository/
   config_path: app/data/input/config.yaml
   database_path: app/data/output/master.sqlite3
   log_path: app/data/output/app.log
