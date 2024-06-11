@@ -36,17 +36,17 @@ def load_config(config_path, file_manager_inst):
         for key, value in os.environ.items()
         if key.startswith('APP_')
     }
-    print(env_vars)
+    #print(env_vars)
     if 'app_config_file' in env_vars:
         if env_vars['app_config_file'] != config_path:
             config_path = env_vars['app_config_file']
 
-    print(config_path)
+    #print(config_path)
     config = file_manager_inst.read_yaml(config_path)
     if config:
         setup_logging(config["logging"])
         #config = yaml.safe_load(config_content)
-        print(config)
+        #print(config)
         # Load environment variables
 
         # Merge environment variables into the configuration

@@ -12,7 +12,8 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    ForeignKey)
+    ForeignKey,
+    Boolean)
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     DeclarativeBase,
@@ -46,6 +47,7 @@ class InterfaceName(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
+
     def __repr__(self):
         return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
     def __str__(self):
@@ -64,6 +66,7 @@ class Device(Base):
     data: Mapped[List[str]] = mapped_column(String, nullable=True)
     connection_options: Mapped[List[str]] = mapped_column(String, nullable=True)
     defaults: Mapped[List[str]] = mapped_column(String, nullable=True)
+    enabled: Mapped[Boolean] = mapped_column(Boolean, default=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
