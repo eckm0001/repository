@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine import URL
-from models import Base, User, Device
+from models import Base, Users, Devices, InterfaceNames, Interfaces
+from models import StackData, Models, Vendors
 
 class DatabaseManager:
     def __init__(self, db_url: URL):
@@ -15,7 +16,7 @@ class DatabaseManager:
     def create_tables(self, *models: Type[Base]):
         Base.metadata.create_all(self.engine, tables=[model.__table__ for model in models])
 
-    def get_or_create_user(self, session: Session, username: str, password: str) -> User:
+    def get_or_create_user(self, session: Session, username: str, password: str) -> Users:
         user = session.query(User).filter_by(username=username).first()
         if not user:
             user = User(username=username, password=password)

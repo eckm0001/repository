@@ -1,6 +1,7 @@
 
 import logging
 import logging.config
+import colorlog
 import datetime
 #from datetime import datetime
 #import json
@@ -29,28 +30,28 @@ logger = logging.getLogger(__name__)
 def get_inventory(sess, conf):
     defaults = {'username': conf['env']['app_cred_u1'], 'password': conf['env']['app_cred_p1']}
     users = sess.execute(
-        select(models.User).where(models.User.username.in_([defaults['username']]))
+        select(models.Users).where(models.Users.username.in_([defaults['username']]))
     ).first()[0]
     username = users.username
     password = users.password
     devices = sess.execute(
-        select(models.Device)
+        select(models.Devices)
     ).fetchall()
     inv = {}
     for line in devices:
-        if line.Device.enabled:
-            inv[line.Device.name] = {
-                "name": line.Device.name,
+        if line.Devices.enabled:
+            inv[line.Devices.name] = {
+                "name": line.Devices.name,
                 "connection_options": {
                     "napalm": {
-                        "hostname": line.Device.hostname,
+                        "hostname": line.Devices.hostname,
                         "port": 22,
                         "username": username,
                         "password": password,
-                        "platform": line.Device.platform
+                        "platform": line.Devices.platform
                     }
                 },
-                "enabled": line.Device.enabled
+                "enabled": line.Devices.enabled
             }
     logger.info(inv)
     return inv
@@ -115,7 +116,9 @@ def main_app():
     db_manager = sql_io.DatabaseManager(URL.create(drivername='sqlite',database= 'app/data/output/master.sqlite3'))
 
     # Create tables
-    db_manager.create_tables(models.Device, models.User)
+    db_manager.create_tables(models.Devices, models.Users, models.InterfaceNames, models.Interfaces)
+    db_manager.create_tables(models.StackData, models.Models, models.Vendors)
+
 
     logger.info('Application started')
     #logger.info("Command line args: %s", args)
@@ -125,7 +128,7 @@ def main_app():
 
 #initialize data
     with db_manager.session_scope() as session:
-        stmt = select(models.User).filter_by(username=defaults['username'])
+        stmt = select(models.Users).filter_by(username=defaults['username'])
         user_obj = session.scalars(stmt).first()
         if not user_obj:
             logger.debug('%s does not exist', defaults['username'])
@@ -134,9 +137,9 @@ def main_app():
                 'password': defaults['password'],
                 'created_at': datetime.datetime.now(),
                 }
-            session.add(models.User(**user_data))
+            session.add(models.Users(**user_data))
             session.commit()
-            stmt = select(models.User).filter_by(username=defaults['username'])
+            stmt = select(models.Users).filter_by(username=defaults['username'])
             user_obj = session.scalars(stmt).first()
             if user_obj:
                 logger.info('_____%s created', defaults['username'])
@@ -149,18 +152,18 @@ def main_app():
             for row in csv_data:
                 logger.debug("_____%s",row['name'])
                 device_data = {}
-                stmt = select(models.Device).filter_by(name=row['name'])
+                stmt = select(models.Devices).filter_by(name=row['name'])
                 dev_obj = session.scalars(stmt).first()
                 if dev_obj:
                     #print(devs,row['name'])
                     logger.debug("_____%s  exists", row.get('name'))
                 else:
                     logger.error('_____%s does not exist', row.get('name'))
-                    user = select(models.User).filter_by(username=defaults['username'])
+                    user = select(models.Users).filter_by(username=defaults['username'])
                     usr_obj = session.scalars(user).first()
                     #print("===============",usr_obj)
                     row_port = row["port"] if 'port' in row else None
-                    user_id = models.User.id
+                    user_id = models.Users.id
                     device_data = {
                     'name': row['name'],
                     'hostname': row['hostname'],
@@ -171,10 +174,10 @@ def main_app():
                     'enabled': True,
                     'created_at': datetime.datetime.now(),
                     }
-                    session.add(models.Device(**device_data))
+                    session.add(models.Devices(**device_data))
                     session.commit()
 
-                    stmt = select(models.Device,models.User).filter_by(id=models.User.id)
+                    stmt = select(models.Devices,models.Users).filter_by(id=models.Users.id)
                     dev_obj = session.scalars(stmt).first()
                     if dev_obj:
                         logger.info('_____%s %s created', row['name'], dev_obj)
@@ -197,31 +200,43 @@ def main_app():
             name='configs',
             task=mynr.napalm_configs,
         )
-    
+    ress1 = {}
+    ress2 = {}
+    ress3 = {}
     with db_manager.session_scope() as session:
-        ress1 = {}
-        ress2 = {}
-        ress3 = {}
+
         for host in nr.inventory.hosts.keys():
             print("---")
             if result1[host][0].failed:
                 print(f"{host} failed")
-                stmt = select(models.Device).filter_by(name=models.Device.name)
+                stmt = select(models.Devices).filter_by(name=models.Devices.name)
                 dev_obj = session.scalars(stmt).first()
                 if dev_obj:
                     device_data = {
                         'id': dev_obj.id,
                         'enabled': False
                     }
-                    session.merge(models.Device(**device_data))
+                    session.merge(models.Devices(**device_data))
                     session.commit()
             else:
                 ress1[host]=(result1[host][1].result)["get_facts"]
                 ress2[host]=(result2[host][1].result)["get_interfaces"]
                 ress3[host]=(result3[host][1].result)["get_config"]
-        print(ress1)
-        print(ress2)
-        print(ress3)
+    logger.debug("%s",ress1)
+    logger.debug("%s",ress2)
+    logger.debug("%s",ress3)
+    logger.info("-------------------------------------")
+    with db_manager.session_scope() as session:
+        for name, value in ress1.items():
+            stmt = select(models.Devices).filter_by(name=name)
+            dev_obj = session.scalars(stmt).first()
+            if dev_obj:
+                device_data = {
+                    'id': dev_obj.id,
+                    'uptime': value["uptime"]
+                }
+                session.merge(models.Devices(**device_data))
+                session.commit()
 
 def main():
     #args = config.parse_arguments()
