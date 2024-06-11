@@ -45,14 +45,7 @@ def load_config(config_path, file_manager_inst):
     config = file_manager_inst.read_yaml(config_path)
     if config:
         setup_logging(config["logging"])
-        #config = yaml.safe_load(config_content)
-        #print(config)
-        # Load environment variables
-
-        # Merge environment variables into the configuration
         config["env"] = env_vars
-        #config.update(env_vars)
-
         return config
     else:
         return {}

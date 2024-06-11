@@ -127,10 +127,10 @@ def main_app():
                         session.add(models.Devices(**device_data))
                         session.commit()
 
-                    stmt = select(models.Devices,models.Users).filter_by(id=models.Users.id)
-                    dev_obj = session.scalars(stmt).first()
-                    if dev_obj:
-                        logger.info('_____%s %s created', row['name'], dev_obj)
+                    stmt = select(models.Devices).filter_by(name=row['name'])
+                    devi_obj = session.scalars(stmt).first()
+                    if devi_obj:
+                        logger.info('_____%s %s created', row['name'], devi_obj)
                     else:
                         logger.error('_____%s  not created', row['name'])
     # next section
@@ -178,6 +178,7 @@ def main_app():
     logger.info("-------------------------------------")
     with db_manager.session_scope() as session:
         for name, value in ress1.items():
+            print('\n__________',name, value.values())
             stmt = select(models.Devices).filter_by(name=name)
             dev_obj = session.scalars(stmt).first()
             if dev_obj:
