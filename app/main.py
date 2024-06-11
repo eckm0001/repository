@@ -169,6 +169,7 @@ def main_app():
                     session.merge(models.Devices(**device_data))
                     session.commit()
             else:
+                print(f"{host} collected")
                 ress1[host]=(result1[host][1].result)["get_facts"]
                 ress2[host]=(result2[host][1].result)["get_interfaces"]
                 ress3[host]=(result3[host][1].result)["get_config"]
