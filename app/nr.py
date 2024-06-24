@@ -91,15 +91,20 @@ def napalm_interfaces_counters(task: Task,) -> Result:
     )
     return Result(host=task.host, result=napalm_getters)
 
-def example_command_using_napalm(task: Task,) -> Result:
+
+def getters_using_napalm(
+    task: Task,
+) -> Result:
     """
     Send commands using napalm_cli
     """
     cmd_ret = task.run(
-        task=napalm_cli,
-        commands=[
-            "show version",
-            "show hostname",
+        task=napalm_get,
+        getters=[
+            "get_facts",
+            "get_config",
+            "get_interfaces",
+            "get_interfaces_counters",
         ],
     )
     # In case you want to work with the returns for the individual

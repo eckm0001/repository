@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.engine import URL
 from sqlalchemy import select
-from models import Base, Users, Devices, InterfaceNames, Interfaces
+from models import Base, Users, Devices, InterfaceNames, InterfacesData
 from models import StackData, Models, Vendors
-#import models as models
+# import models as models
 logger = logging.getLogger(__name__)
 
 class DatabaseManager:

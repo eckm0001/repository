@@ -15,7 +15,7 @@ from sqlalchemy import (
     ForeignKey,
     Boolean,
     Float)
-#from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -46,7 +46,7 @@ class InterfaceNames(Base):
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
 
     name: Mapped[str] = mapped_column(String, nullable=False)
-    abbrev: Mapped[str] = mapped_column(String, nullable=False)
+    abbrev: Mapped[str] = mapped_column(String, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
@@ -55,9 +55,11 @@ class InterfaceNames(Base):
     def __str__(self):
         return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
-class Interfaces(Base):
+
+class InterfacesData(Base):
     __tablename__ = "interfaces_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
+    device_id: Mapped[int] = mapped_column(ForeignKey("devices_table.id"))
 
 
 class StackData(Base):
@@ -70,17 +72,33 @@ class StackData(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
+
+class Serials(Base):
+    __tablename__ = "serials_table"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    serial: Mapped[str] = mapped_column(String, nullable=False)
+    asset: Mapped[str] = mapped_column(String, nullable=False)
+
+
+class OSVersions(Base):
+    __tablename__ = "osversions_table"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    os_version: Mapped[str] = mapped_column(String, nullable=False)
+
+
 class Models(Base):
     __tablename__ = "models_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
+    model: Mapped[str] = mapped_column(String, nullable=False)
 
 class Vendors(Base):
     __tablename__ = "vendors_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
+    vendor: Mapped[str] = mapped_column(String, nullable=False)
 
 class Devices(Base):
     __tablename__ = 'devices_table'
-    
+
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     hostname: Mapped[str] = mapped_column(String, nullable=False)
@@ -91,6 +109,18 @@ class Devices(Base):
     data: Mapped[List[str]] = mapped_column(String, nullable=True)
     connection_options: Mapped[List[str]] = mapped_column(String, nullable=True)
     defaults: Mapped[List[str]] = mapped_column(String, nullable=True)
+    vendor_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("vendors_table.id")
+    )  # , default=Any|None)
+    model_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("models_table.id")
+    )  # , default=Any|None)
+    os_version_data: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("osversions_table.id")
+    )  # , default=Any|None)
+    serial_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("serials_table.id")
+    )  # , default=Any|None)
     uptime: Mapped[Float] = mapped_column(Float, default=0)
     enabled: Mapped[Boolean] = mapped_column(Boolean, default=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
