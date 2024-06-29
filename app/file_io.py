@@ -1,5 +1,6 @@
-
-from ast import Dict
+""" file_io.py
+"""
+#from ast import Dict
 from contextlib import contextmanager
 from pathlib import Path
 import logging
@@ -12,6 +13,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 class FileManager:
+    """ FileManager class for managing files and directories.
+    """
     def __init__(self):
         #self.config_file = config , config_file
         self.basedir = Path('app/data/')
@@ -19,6 +22,8 @@ class FileManager:
 
     @contextmanager
     def custom_read(self, filename):
+        """ custom_read
+        """
         f = open(filename, "r", encoding='utf-8')
         try:
             yield f
@@ -27,6 +32,8 @@ class FileManager:
 
     @contextmanager
     def custom_write(self, filename):
+        """ custom_write
+        """
         f = open(filename, "w", encoding='utf-8')
         try:
             yield f
@@ -34,6 +41,8 @@ class FileManager:
             f.close()
 
     def read_file(self, filename):
+        """ read_file
+        """
         try:
             #print(self.basedir)
             with self.custom_read(filename) as file:
@@ -69,6 +78,8 @@ class FileManager:
             return False
 
     def read_yaml(self, filename):
+        """ read_yaml
+        """
         try:
             #print(self.basedir)
             with self.custom_read(filename) as file:
@@ -102,6 +113,8 @@ class FileManager:
             self.logger.error('Error reading CSV file: %s %s', file_path, e)
 
     def write_file(self, filename, content):
+        """ write_file
+        """
         try:
             with self.custom_write(filename) as file:
                 file.write(content)
