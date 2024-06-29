@@ -1,17 +1,29 @@
+""" nornir functions """
+
 # note that these imports are only needed if you are annotating your code with types
-from typing import Dict
+#from typing import Dict
 import logging
 from nornir import InitNornir
-from nornir.core.inventory import Host
-from nornir.core.task import AggregatedResult, MultiResult, Result, Task
-from nornir_napalm.plugins.tasks import napalm_configure, napalm_cli, napalm_get
+#from nornir.core.inventory import Host
+from nornir.core.task import (
+#    AggregatedResult,
+#    MultiResult,
+    Result,
+    Task,
+    )
+from nornir_napalm.plugins.tasks import (
+#    napalm_configure,
+#    napalm_cli,
+    napalm_get,
+)
 from nornir_netmiko.tasks import netmiko_send_command
 
-import sql_io as sql_io
+import sql_io
 
 logger = logging.getLogger(__name__)
 
 def init_nr(sess,conf):
+    """ initialize nornir """
     # groups = {'iosxr':  {'platform': 'iosxr'},
     #         'iosxe':  {'platform': 'iosxe'},
     #         'ios':  {'platform': 'ios'},
@@ -33,6 +45,7 @@ def init_nr(sess,conf):
     return nr
 
 def greeter(task: Task, greet: str) -> Result:
+    """ greeter function """
     return Result(host=task.host, result=f"{greet}! my name is {task.host.name}")
 
 def napalm_facts(task: Task) -> Result:

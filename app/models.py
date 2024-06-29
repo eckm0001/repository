@@ -27,12 +27,12 @@ from sqlalchemy.orm import (
     )
 from sqlalchemy.sql import func
 
-# class Base(DeclarativeBase):
-#     """ class base
-#     """
-#     pass
+class Base(DeclarativeBase):
+    """ class base
+    """
+    pass
 
-class Users(DeclarativeBase):
+class Users(Base):
     """ class users
     """
     __tablename__ = 'users_table'
@@ -54,7 +54,7 @@ class Users(DeclarativeBase):
         return f"User(id={self.id}, username='{self.username}', password='{self.password}'"+\
             f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
-class InterfaceNames(DeclarativeBase):
+class InterfaceNames(Base):
     """ class interface names
     """
     __tablename__ = "interfacenames_table"
@@ -76,7 +76,7 @@ class InterfaceNames(DeclarativeBase):
             f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
 
-class InterfacesData(DeclarativeBase):
+class InterfacesData(Base):
     """ interfaces data
     """
     __tablename__ = "interfaces_table"
@@ -84,7 +84,7 @@ class InterfacesData(DeclarativeBase):
     device_id: Mapped[int] = mapped_column(ForeignKey("devices_table.id"))
 
 
-class StackData(DeclarativeBase):
+class StackData(Base):
     """ stack data
     """
     __tablename__ = "stackdata_table"
@@ -99,7 +99,7 @@ class StackData(DeclarativeBase):
         DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
 
-class Serials(DeclarativeBase):
+class Serials(Base):
     """ serials
     """
     __tablename__ = "serials_table"
@@ -108,28 +108,28 @@ class Serials(DeclarativeBase):
     asset: Mapped[str] = mapped_column(String, nullable=False)
 
 
-class OSVersions(DeclarativeBase):
+class OSVersions(Base):
     """ os versions
     """
     __tablename__ = "osversions_table"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     os_version: Mapped[str] = mapped_column(String, nullable=False)
 
-class Models(DeclarativeBase):
+class Models(Base):
     """ models
     """
     __tablename__ = "models_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     model: Mapped[str] = mapped_column(String, nullable=False)
 
-class Vendors(DeclarativeBase):
+class Vendors(Base):
     """ vendors
     """
     __tablename__ = "vendors_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     vendor: Mapped[str] = mapped_column(String, nullable=False)
 
-class Devices(DeclarativeBase):
+class Devices(Base):
     """ devices
     """
     __tablename__ = 'devices_table'
