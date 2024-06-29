@@ -14,19 +14,10 @@ from sqlalchemy import select
 # from sqlalchemy.orm import Session
 from sqlalchemy.engine import URL
 
-# import sqlalchemy as db
-# from nornir_table_inventory import FlatDataInventory
-# import pandas as pd
-# import nornir
-from nornir import InitNornir
-# from nornir.core.inventory import Host
-# from nornir_utils.plugins.functions import print_result
-# from napalm import get_network_driver
-# from rich import print as rprint
 from config import parse_arguments, load_config, LOGO
-import file_io as file_io
-import sql_io as sql_io
-import models as models
+import file_io
+import sql_io# as sql_io
+import models #as models
 import nr as mynr
 # # Get the logger instance
 logger = logging.getLogger(__name__)
@@ -48,25 +39,13 @@ def main_app():
     logger.info("Command line args: %s", args)
     # purge things
     if args.purge is True:
-
         logger.info('_____purging %s',cfg.get("app_defaults",{}).get("database_path",'database.db'))
         file_mgr.delete_file(Path(cfg.get("app_defaults",{}).get("database_path",'database.db')))
-
-    ####!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # Read a CSV file
-    # file_manager = file_io.FileManager()
-
     groups = {'iosxr':  {'platform': 'iosxr'},
                 'iosxe':  {'platform': 'iosxe'},
                 'ios':  {'platform': 'ios'},
                 'nxos':  {'platform': 'nxos'}}
     defaults = {'username': cfg['env']['app_cred_u1'], 'password': cfg['env']['app_cred_p1']}
-
-    # db_url = URL.create(        drivername='sqlite',
-    #         database= 'app/data/output/master.sqlite3')
-    # db_url = 'sqlite:///app/data/output/' + cfg.get
-    # ("app_defaults", {}).get("database", 'database.db')
-    # Create a DatabaseManager instance
 
     db_mgr=sql_io.DatabaseManager(
         URL.create(

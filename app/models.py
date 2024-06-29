@@ -1,14 +1,17 @@
+""" models
+"""
 from __future__ import annotations
 from typing import (
     Optional,
     List,
-    Dict,
-    Tuple,
+#    Dict,
+#    Tuple,
     Any,
-    Union)
+#    Union
+)
 
 from sqlalchemy import (
-    Column,
+#    Column,
     Integer,
     String,
     DateTime,
@@ -20,13 +23,18 @@ from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
-    relationship)
+#    relationship,
+    )
 from sqlalchemy.sql import func
 
-class Base(DeclarativeBase):
-    pass
+# class Base(DeclarativeBase):
+#     """ class base
+#     """
+#     pass
 
-class Users(Base):
+class Users(DeclarativeBase):
+    """ class users
+    """
     __tablename__ = 'users_table'
 
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
@@ -34,69 +42,96 @@ class Users(Base):
     username: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    updated_on: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        onupdate=func.now(),
+        nullable=True)
     #devices: Mapped[Optional["Device"]] = relationship()
     def __repr__(self):
-        return f"User(id={self.id}, username='{self.username}', password='{self.password}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"User(id={self.id}, username='{self.username}', password='{self.password}'"+\
+            f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
     def __str__(self):
-        return f"User(id={self.id}, username='{self.username}', password='{self.password}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"User(id={self.id}, username='{self.username}', password='{self.password}'"+\
+            f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
-class InterfaceNames(Base):
+class InterfaceNames(DeclarativeBase):
+    """ class interface names
+    """
     __tablename__ = "interfacenames_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
 
     name: Mapped[str] = mapped_column(String, nullable=False)
     abbrev: Mapped[str] = mapped_column(String, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    updated_on: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        onupdate=func.now(),
+        nullable=True)
 
     def __repr__(self):
-        return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}'"+\
+            f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
     def __str__(self):
-        return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"InterfaceName(id={self.id}, name='{self.name}', abbrev='{self.abbrev}'"+\
+            f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
 
-class InterfacesData(Base):
+class InterfacesData(DeclarativeBase):
+    """ interfaces data
+    """
     __tablename__ = "interfaces_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     device_id: Mapped[int] = mapped_column(ForeignKey("devices_table.id"))
 
 
-class StackData(Base):
+class StackData(DeclarativeBase):
+    """ stack data
+    """
     __tablename__ = "stackdata_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     interface_name_id: Mapped[Optional[int]] = mapped_column(ForeignKey('interfacenames_table.id'))
     model: Mapped[str] = mapped_column(String, nullable=False)
     os_verson: Mapped[str] = mapped_column(String, nullable=False)
     shelves: Mapped[int] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
-    updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=True)
+    updated_on: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
 
-class Serials(Base):
+class Serials(DeclarativeBase):
+    """ serials
+    """
     __tablename__ = "serials_table"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     serial: Mapped[str] = mapped_column(String, nullable=False)
     asset: Mapped[str] = mapped_column(String, nullable=False)
 
 
-class OSVersions(Base):
+class OSVersions(DeclarativeBase):
+    """ os versions
+    """
     __tablename__ = "osversions_table"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     os_version: Mapped[str] = mapped_column(String, nullable=False)
 
-
-class Models(Base):
+class Models(DeclarativeBase):
+    """ models
+    """
     __tablename__ = "models_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     model: Mapped[str] = mapped_column(String, nullable=False)
 
-class Vendors(Base):
+class Vendors(DeclarativeBase):
+    """ vendors
+    """
     __tablename__ = "vendors_table"
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
     vendor: Mapped[str] = mapped_column(String, nullable=False)
 
-class Devices(Base):
+class Devices(DeclarativeBase):
+    """ devices
+    """
     __tablename__ = 'devices_table'
 
     id: Mapped[int] = mapped_column(primary_key=True,autoincrement=True)
@@ -104,7 +139,7 @@ class Devices(Base):
     hostname: Mapped[str] = mapped_column(String, nullable=False)
     port: Mapped[int] = mapped_column(Integer, nullable=True)
     user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users_table.id'), default=Any|None)
-    platform: Mapped[str] = mapped_column(String, nullable=True) 
+    platform: Mapped[str] = mapped_column(String, nullable=True)
     groups: Mapped[List[str]] = mapped_column(String, nullable=True)
     data: Mapped[List[str]] = mapped_column(String, nullable=True)
     connection_options: Mapped[List[str]] = mapped_column(String, nullable=True)
@@ -123,10 +158,16 @@ class Devices(Base):
     )  # , default=Any|None)
     uptime: Mapped[Float] = mapped_column(Float, default=0)
     enabled: Mapped[Boolean] = mapped_column(Boolean, default=True)
-    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
-    updated_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    created_at: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=True)
+    updated_on: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
     def __repr__(self):
-        return f"Device(id={self.id}, name='{self.name}', hostname='{self.hostname}', user_id='{self.user_id}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"Device(id={self.id}, name='{self.name}', hostname='{self.hostname}'"+\
+            f", user_id='{self.user_id}', created_at='{self.created_at}'"+\
+            f", updated_on='{self.updated_on}')"
     def __str__(self):
-        return f"Device(id={self.id}, name='{self.name}', hostname='{self.hostname}', user_id='{self.user_id}', created_at='{self.created_at}', updated_on='{self.updated_on}')"
+        return f"Device(id={self.id}, name='{self.name}', hostname='{self.hostname}'"+\
+            f", user_id='{self.user_id}', created_at='{self.created_at}'"+\
+            f", updated_on='{self.updated_on}')"
