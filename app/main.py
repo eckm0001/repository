@@ -55,10 +55,10 @@ def main_app():
         )
 
     # Create tables
-    db_mgr.create_tables(
-        models.Devices, models.Users, models.InterfaceNames, models.InterfacesData
-    )
-    db_mgr.create_tables(models.StackData, models.Models, models.Vendors)
+    db_mgr.create_tables()
+    #     models.Devices, models.Users, models.InterfaceNames, models.InterfacesData
+    # )
+    # db_mgr.create_tables(models.StackData, models.Models, models.Vendors)
 
     logger.info('Application started')
     # logger.info("Command line args: %s", args)
@@ -156,8 +156,9 @@ def main_app():
                 print(f"{host} collected")
                 ress1[host] = result1[host][1].result
 
-    logger.debug("%s", ress1)
-    logger.info("-------------------------------------")
+    if ress1:
+        logger.debug("%s", ress1)
+        logger.info("-------------------------------------")
     with db_mgr.session_scope() as session:
         for name, dicts in ress1.items():
             for task, result in dicts.items():
