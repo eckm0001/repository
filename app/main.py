@@ -1,16 +1,19 @@
+""" main
+"""
 import logging
 import logging.config
-import colorlog
+#import colorlog
 import datetime
 import re
 
 # from datetime import datetime
 # import json
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import select
 # from sqlalchemy.orm import Session
 from sqlalchemy.engine import URL
-from pathlib import Path
+
 # import sqlalchemy as db
 # from nornir_table_inventory import FlatDataInventory
 # import pandas as pd
@@ -29,24 +32,25 @@ import nr as mynr
 logger = logging.getLogger(__name__)
 
 def main_app():
-
+    """ main app
+    """
     # load environment
     load_dotenv()
     # Parse command-line arguments
     args = parse_arguments()
 
     # create filemanager instance
-    file_manager = file_io.FileManager()
+    file_mgr = file_io.FileManager()
 
     # Load the configuration
-    cfg = load_config(args.config, file_manager)
+    cfg = load_config(args.config, file_mgr)
     logger.info(LOGO)
     logger.info("Command line args: %s", args)
     # purge things
-    if args.purge==True:
+    if args.purge is True:
 
-        logger.info('_____purging %s', cfg.get("app_defaults", {}).get("database_path", 'database.db'))
-        file_manager.delete_file(Path(cfg.get("app_defaults", {}).get("database_path", 'database.db')))
+        logger.info('_____purging %s',cfg.get("app_defaults",{}).get("database_path",'database.db'))
+        file_mgr.delete_file(Path(cfg.get("app_defaults",{}).get("database_path",'database.db')))
 
     ####!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # Read a CSV file
@@ -64,13 +68,18 @@ def main_app():
     # ("app_defaults", {}).get("database", 'database.db')
     # Create a DatabaseManager instance
 
-    db_manager = sql_io.DatabaseManager(URL.create(drivername='sqlite',database= 'app/data/output/master.sqlite3'))
+    db_mgr=sql_io.DatabaseManager(
+        URL.create(
+            drivername='sqlite',
+            database=str(Path(cfg.get("app_defaults",{}).get("database_path",'database.db')))
+            )
+        )
 
     # Create tables
-    db_manager.create_tables(
+    db_mgr.create_tables(
         models.Devices, models.Users, models.InterfaceNames, models.InterfacesData
     )
-    db_manager.create_tables(models.StackData, models.Models, models.Vendors)
+    db_mgr.create_tables(models.StackData, models.Models, models.Vendors)
 
     logger.info('Application started')
     # logger.info("Command line args: %s", args)
@@ -79,7 +88,7 @@ def main_app():
     logger.info('Application defaults: %s', cfg["app_defaults"])
 
     # initialize data
-    with db_manager.session_scope() as session:
+    with db_mgr.session_scope() as session:
         stmt = select(models.Users).filter_by(username=defaults['username'])
         user_obj = session.scalars(stmt).first()
         if not user_obj:
@@ -99,7 +108,7 @@ def main_app():
                 logger.error('_____%s not created', defaults['username'])
         else:
             logger.debug('_____%s exists', defaults['username'])
-        csv_data=file_manager.read_csv(cfg["app_defaults"]["csv_path"])
+        csv_data=file_mgr.read_csv(cfg["app_defaults"]["csv_path"])
         if csv_data:
             for row in csv_data:
                 logger.debug("_____%s",row['name'])
@@ -113,7 +122,7 @@ def main_app():
                     logger.error('_____%s does not exist', row.get('name'))
                     usr = select(models.Users).filter_by(username=defaults['username'])
                     usr_obj = session.scalars(usr).first()
-                    if usr_obj != None:
+                    if usr_obj is not None:
                         # print("===============",usr_obj)
                         row_port = row["port"] if 'port' in row else None
                         device_data = {
@@ -137,7 +146,7 @@ def main_app():
                         logger.error('_____%s  not created', row['name'])
     # next section
     # data = {}
-    with db_manager.session_scope() as session:
+    with db_mgr.session_scope() as session:
         nr = mynr.init_nr(session, cfg)
 
         result1 = nr.run(
@@ -147,9 +156,9 @@ def main_app():
         # )
 
     ress1 = {}
-    ress2 = {}
-    ress3 = {}
-    with db_manager.session_scope() as session:
+    # ress2 = {}
+    # ress3 = {}
+    with db_mgr.session_scope() as session:
 
         for host in nr.inventory.hosts.keys():
             print("---")
@@ -170,7 +179,7 @@ def main_app():
 
     logger.debug("%s", ress1)
     logger.info("-------------------------------------")
-    with db_manager.session_scope() as session:
+    with db_mgr.session_scope() as session:
         for name, dicts in ress1.items():
             for task, result in dicts.items():
                 # setum = 1
@@ -303,7 +312,7 @@ def main_app():
                             )
                             int_data_obj = session.scalars(int_data_stmt).fetchall()
                             if int_data_obj:
-                                session.add(models.InterfaceData(**interface_data))
+                                session.add(models.InterfacesData(**interface_data))
                                 session.commit()
 
                         new_name = dev_obj.name
@@ -327,6 +336,8 @@ def main_app():
 
 
 def main():
+    """ main
+    """
     # args = config.parse_arguments()
     main_app()
 
