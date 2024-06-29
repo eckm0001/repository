@@ -1,13 +1,15 @@
+""" config.py
+"""
 import argparse
-import yaml
+#import yaml
 import os
-from pathlib import Path
+#from pathlib import Path
 import logging
 import logging.config
-import colorlog
+#import colorlog
 logger = logging.getLogger(__name__)
 
-import file_io as file_io
+#import file_io
 
 def setup_logging(logging_config):
     """
@@ -20,8 +22,10 @@ def parse_arguments():
     Parse command-line arguments.
     """
     parser = argparse.ArgumentParser(description='My Python Application')
-    parser.add_argument('-c', '--config', help='Path to the configuration file', default='app/data/input/config.yaml', required=False)
-    parser.add_argument("-p", "--purge", action='store_true', default=False, help="purge database before storing")
+    parser.add_argument('-c', '--config', help='Path to the configuration file',
+        default='app/data/input/config.yaml', required=False)
+    parser.add_argument("-p", "--purge", action='store_true', default=False,
+        help="purge database before storing")
     args = parser.parse_args()
 
     return args
@@ -30,7 +34,7 @@ def load_config(config_path, file_manager_inst):
     """
     Load the application configuration from a YAML file and environment variables.
     """
-    cfg_path = None
+    #config_path = None
     env_vars = {
         key.lower(): value
         for key, value in os.environ.items()
