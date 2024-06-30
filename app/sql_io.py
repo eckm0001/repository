@@ -13,7 +13,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy import select
 from models import (
     Base,
-    Users,
+    Creds,
     Devices,
 #    InterfaceNames,
 #    InterfacesData,
@@ -36,11 +36,11 @@ class DatabaseManager:
         """ Dataggg """
         Base.metadata.create_all(self.engine) #, tables=[(model.__table__) for model in models])
 
-    def get_or_create_user(self, session: Session, username: str, password: str) -> Users:
+    def get_or_create_user(self, session: Session, username: str, password: str) -> Creds:
         """ Dataggg """
-        user = session.query(Users).filter_by(username=username).first()
+        user = session.query(Creds).filter_by(username=username).first()
         if not user:
-            user = Users(username=username, password=password)
+            user = Creds(username=username, password=password)
             session.add(user)
             session.commit()
         return user
@@ -72,11 +72,11 @@ class DatabaseManager:
 def get_inventory(sess, conf):
     """ Dataggg """
     defaults = {'username': conf['env']['app_cred_u1'], 'password': conf['env']['app_cred_p1']}
-    users = sess.execute(
-        select(Users).where(Users.username.in_([defaults['username']]))
+    creds = sess.execute(
+        select(Creds).where(Creds.username.in_([defaults['username']]))
     ).first()[0]
-    username = users.username
-    password = users.password
+    username = creds.username
+    password = creds.password
     devices = sess.execute(
         select(Devices)
     ).fetchall()

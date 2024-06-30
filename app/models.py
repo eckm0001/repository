@@ -32,7 +32,7 @@ class Base(DeclarativeBase):
     """
     pass
 
-class Users(Base):
+class Creds(Base):
     """ class users
     """
     __tablename__ = 'users_table'
@@ -48,10 +48,10 @@ class Users(Base):
         nullable=True)
     #devices: Mapped[Optional["Device"]] = relationship()
     def __repr__(self):
-        return f"User(id={self.id}, username='{self.username}', password='{self.password}'"+\
+        return f"Creds(id={self.id}, username='{self.username}', password='{self.password}'"+\
             f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
     def __str__(self):
-        return f"User(id={self.id}, username='{self.username}', password='{self.password}'"+\
+        return f"Creds(id={self.id}, username='{self.username}', password='{self.password}'"+\
             f", created_at='{self.created_at}', updated_on='{self.updated_on}')"
 
 class InterfaceNames(Base):

@@ -56,7 +56,7 @@ def main_app():
 
     # Create tables
     db_mgr.create_tables()
-    #     models.Devices, models.Users, models.InterfaceNames, models.InterfacesData
+    #     models.Devices, models.Creds, models.InterfaceNames, models.InterfacesData
     # )
     # db_mgr.create_tables(models.StackData, models.Models, models.Vendors)
 
@@ -68,7 +68,7 @@ def main_app():
 
     # initialize data
     with db_mgr.session_scope() as session:
-        stmt = select(models.Users).filter_by(username=defaults['username'])
+        stmt = select(models.Creds).filter_by(username=defaults['username'])
         user_obj = session.scalars(stmt).first()
         if not user_obj:
             logger.debug('%s does not exist', defaults['username'])
@@ -77,9 +77,9 @@ def main_app():
                 'password': defaults['password'],
                 'created_at': datetime.datetime.now(),
                 }
-            session.add(models.Users(**user_data))
+            session.add(models.Creds(**user_data))
             session.commit()
-            stmt = select(models.Users).filter_by(username=defaults['username'])
+            stmt = select(models.Creds).filter_by(username=defaults['username'])
             user_obj = session.scalars(stmt).first()
             if user_obj:
                 logger.info('_____%s created', defaults['username'])
@@ -99,7 +99,7 @@ def main_app():
                     logger.debug("_____%s  exists", row.get('name'))
                 else:
                     logger.error('_____%s does not exist', row.get('name'))
-                    usr = select(models.Users).filter_by(username=defaults['username'])
+                    usr = select(models.Creds).filter_by(username=defaults['username'])
                     usr_obj = session.scalars(usr).first()
                     if usr_obj is not None:
                         # print("===============",usr_obj)
@@ -108,7 +108,7 @@ def main_app():
                             'name': row['name'],
                             'hostname': row['hostname'],
                             'port': row_port,
-                            'user_id': usr_obj.id, #  models.Users.id
+                            'user_id': usr_obj.id, #  models.Creds.id
                             'platform': row['platform'],
                             'groups': groups[row['platform']]['platform'],
                             'enabled': True,
